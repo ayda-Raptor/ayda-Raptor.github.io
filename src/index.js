@@ -29,7 +29,15 @@ function buildScene(scene, renderer) {
         cube.rotation.y += 0.01;
     };
 
-    window.addEventListener('resize', () => onWindowResize(renderer, camera), false);
+    let resizeDebounce;
+    window.addEventListener(
+        'resize',
+        function () {
+            clearTimeout(resizeDebounce);
+            resizeDebounce = setTimeout(() => onWindowResize(renderer, camera), 200);
+        },
+        false
+    );
 
     renderer.setAnimationLoop(() => animate(renderer, scene, camera));
 
@@ -48,21 +56,19 @@ function animate(renderer, scene, camera) {
 function onWindowResize(renderer, camera) {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
+    console.log('resize');
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function fadeInScreen() {
     let curtain = document.getElementById('curtain');
     curtain.classList.add('fade-in');
-    // void curtain.offsetWidth;
     curtain.classList.remove('fade-out');
 }
 
 function fadeOutScreen() {
     let curtain = document.getElementById('curtain');
     curtain.classList.add('fade-out');
-    // void curtain.offsetWidth;
     curtain.classList.remove('fade-in');
 }
 
