@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 console.log('hello!');
 
@@ -20,14 +22,31 @@ function initialise() {
 function buildScene(scene, renderer) {
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 5;
+    camera.position.y = 2;
 
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-    cube.animation = () => {
-        cube.rotation.y += 0.01;
+    const loadingManager = new THREE.LoadingManager();
+    loadingManager.onLoad = () => {
+        fadeInScreen();
     };
+
+    const gltfLoader = new GLTFLoader(loadingManager);
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('./draco/');
+    dracoLoader.preload();
+    gltfLoader.setDRACOLoader(dracoLoader);
+    gltfLoader.load(
+        './models/3DCard_test.glb',
+        function (gltf) {
+            scene.add(gltf.scene);
+            gltf.scene.children[0].material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        },
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+        },
+        function (error) {
+            console.log('An error happened');
+        }
+    );
 
     let resizeDebounce;
     window.addEventListener(
@@ -41,15 +60,12 @@ function buildScene(scene, renderer) {
 
     renderer.setAnimationLoop(() => animate(renderer, scene, camera));
 
-    if (fadeOut) {
-        fadeInScreen();
-    }
+    // if (fadeOut) {
+    //     fadeInScreen();
+    // }
 }
 
 function animate(renderer, scene, camera) {
-    scene.children.forEach((object) => {
-        object.animation();
-    });
     renderer.render(scene, camera);
 }
 
