@@ -11,13 +11,12 @@ body {
     position: absolute;
 }
 
-.fade-button {
+#loading {
+    color: white;
     position: absolute;
-    margin: 0%;
     left: 50%;
-    top: 5vh;
-    transform: translate(-50%, 0%);
-    z-index: 2;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 #curtain {
@@ -32,29 +31,34 @@ body {
 .fade-in {
     animation-name: fadeIn;
     animation-fill-mode: forwards;
-    animation-duration: 2s;
+    animation-duration: 1s;
 }
 
 .fade-out {
     animation-name: fadeOut;
     animation-fill-mode: forwards;
-    animation-duration: 1s;
+    animation-duration: 2s;
+}
+
+.quick-fade-out {
+    animation: fadeOut 0.5s;
+    animation-fill-mode: forwards;
 }
 
 @keyframes fadeIn {
     0% {
-        opacity: 1;
+        opacity: 0;
     }
     100% {
-        opacity: 0;
+        opacity: 1;
     }
 }
 
 @keyframes fadeOut {
     0% {
-        opacity: 0;
+        opacity: 1;
     }
     100% {
-        opacity: 1;
+        opacity: 0;
     }
 }

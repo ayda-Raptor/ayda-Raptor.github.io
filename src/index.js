@@ -4,8 +4,6 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 console.log('hello!');
 
-let fadeOut = true;
-
 initialise();
 
 function initialise() {
@@ -24,9 +22,17 @@ function buildScene(scene, renderer) {
     camera.position.z = 5;
     camera.position.y = 2;
 
+    loadModels(scene);
+
+    setupWindowResize(renderer, camera);
+
+    renderer.setAnimationLoop(() => animate(renderer, scene, camera));
+}
+
+function loadModels(scene) {
     const loadingManager = new THREE.LoadingManager();
     loadingManager.onLoad = () => {
-        fadeInScreen();
+        fadeOutScreen();
     };
 
     const gltfLoader = new GLTFLoader(loadingManager);
@@ -36,50 +42,38 @@ function buildScene(scene, renderer) {
     gltfLoader.setDRACOLoader(dracoLoader);
     gltfLoader.load(
         './models/3DCard_test.glb',
-        function (gltf) {
+        (gltf) => {
             scene.add(gltf.scene);
             gltf.scene.children[0].material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         },
-        function (xhr) {
+        (xhr) => {
             console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
         },
-        function (error) {
+        (error) => {
             console.log('An error happened');
         }
     );
-
-    let resizeDebounce;
-    window.addEventListener(
-        'resize',
-        function () {
-            clearTimeout(resizeDebounce);
-            resizeDebounce = setTimeout(() => onWindowResize(renderer, camera), 200);
-        },
-        false
-    );
-
-    renderer.setAnimationLoop(() => animate(renderer, scene, camera));
-
-    // if (fadeOut) {
-    //     fadeInScreen();
-    // }
 }
 
 function animate(renderer, scene, camera) {
     renderer.render(scene, camera);
 }
 
-function onWindowResize(renderer, camera) {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    console.log('resize');
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-function fadeInScreen() {
-    let curtain = document.getElementById('curtain');
-    curtain.classList.add('fade-in');
-    curtain.classList.remove('fade-out');
+function setupWindowResize(renderer, camera) {
+    let resizeDebounce;
+    window.addEventListener(
+        'resize',
+        function () {
+            clearTimeout(resizeDebounce);
+            resizeDebounce = setTimeout(() => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                console.log('resize');
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }, 200);
+        },
+        false
+    );
 }
 
 function fadeOutScreen() {
@@ -88,12 +82,8 @@ function fadeOutScreen() {
     curtain.classList.remove('fade-in');
 }
 
-window.toggleFade = () => {
-    if (fadeOut) {
-        fadeInScreen();
-        fadeOut = false;
-    } else {
-        fadeOutScreen();
-        fadeOut = true;
-    }
-};
+function fadeInScreen() {
+    let curtain = document.getElementById('curtain');
+    curtain.classList.add('fade-in');
+    curtain.classList.remove('fade-out');
+}
