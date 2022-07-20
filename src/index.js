@@ -54,7 +54,7 @@ function loadModels(scene) {
         (gltf) => {
             scene.add(gltf.scene);
             const action = loadAnimation(gltf);
-            action.play();
+            //action.play();
         },
         (xhr) => {
             console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
