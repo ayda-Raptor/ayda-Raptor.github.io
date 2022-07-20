@@ -4,6 +4,9 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 console.log('hello!');
 
+let animationMixer;
+let clips;
+
 initialise();
 
 function initialise() {
@@ -22,11 +25,11 @@ function buildScene(scene, renderer) {
     camera.position.z = 8;
     camera.position.y = 2;
 
-    loadModels(scene);
-
     setupWindowResize(renderer, camera);
 
-    renderer.setAnimationLoop(() => animate(renderer, scene, camera));
+    loadModels(scene);
+
+    renderer.setAnimationLoop(() => animateRenderer(renderer, scene, camera));
 }
 
 function loadModels(scene) {
@@ -43,8 +46,11 @@ function loadModels(scene) {
     gltfLoader.load(
         './models/3DCard_test.glb',
         (gltf) => {
-            scene.add(gltf.scene);
-            gltf.scene.children[0].material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const mainModel = gltf;
+            scene.add(mainModel.scene);
+            const action = loadAnimation(mainModel);
+            action.play();
+            mainModel.scene.children[0].material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         },
         (xhr) => {
             console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
@@ -55,7 +61,19 @@ function loadModels(scene) {
     );
 }
 
-function animate(renderer, scene, camera) {
+function loadAnimation(model) {
+    animationMixer = new THREE.AnimationMixer(model.scene);
+    clips = model.animations;
+
+    const clip = THREE.AnimationClip.findByName(clips, 'CardBounce');
+    const action = animationMixer.clipAction(clip);
+    return action;
+}
+
+function animateRenderer(renderer, scene, camera) {
+    if (animationMixer) {
+        //animationMixer.update(deltaSeconds);
+    }
     renderer.render(scene, camera);
 }
 
