@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import { Clock } from 'three';
 
 console.log('hello!');
 
 let animationMixer;
 let clips;
+
+const clock = new THREE.Clock();
 
 initialise();
 
@@ -50,7 +53,6 @@ function loadModels(scene) {
             scene.add(mainModel.scene);
             const action = loadAnimation(mainModel);
             action.play();
-            mainModel.scene.children[0].material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         },
         (xhr) => {
             console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
@@ -67,12 +69,14 @@ function loadAnimation(model) {
 
     const clip = THREE.AnimationClip.findByName(clips, 'CardBounce');
     const action = animationMixer.clipAction(clip);
+    action.play();
     return action;
 }
 
 function animateRenderer(renderer, scene, camera) {
+    const delta = clock.getDelta();
     if (animationMixer) {
-        //animationMixer.update(deltaSeconds);
+        animationMixer.update(delta);
     }
     renderer.render(scene, camera);
 }
