@@ -1,6 +1,30 @@
 body {
     margin: 0;
     padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+    position: absolute;
+    left: 50%;
+    top: 85%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    background-color: black;
+    border-style: solid;
+    border-radius: 2rem;
+    border-width: 0.15rem;
+    border-color: white;
+    color: white;
+    padding: 1rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.button-pressed {
+    border-color: grey;
+    color: grey;
 }
 
 #title {
@@ -9,7 +33,6 @@ body {
     top: 2.5vw;
     font-size: 10vmin;
     color: white;
-    font-family: Arial, Helvetica, sans-serif;
     z-index: 2;
 }
 

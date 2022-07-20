@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-import { Clock } from 'three';
+import { Clock, LoopOnce } from 'three';
 
 console.log('hello!');
 
@@ -16,9 +16,12 @@ function initialise() {
     const scene = new THREE.Scene();
     const canvasRef = document.getElementById('three-canvas');
 
+    document.getElementById('animButton').addEventListener('click', playCardAnimationButton);
+
     const renderer = new THREE.WebGLRenderer({ canvas: canvasRef });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+    renderer.outputEncoding = THREE.sRGBEncoding;
 
     buildScene(scene, renderer);
 }
@@ -49,9 +52,8 @@ function loadModels(scene) {
     gltfLoader.load(
         './models/3DCard_test.glb',
         (gltf) => {
-            const mainModel = gltf;
-            scene.add(mainModel.scene);
-            const action = loadAnimation(mainModel);
+            scene.add(gltf.scene);
+            const action = loadAnimation(gltf);
             action.play();
         },
         (xhr) => {
@@ -69,7 +71,7 @@ function loadAnimation(model) {
 
     const clip = THREE.AnimationClip.findByName(clips, 'CardBounce');
     const action = animationMixer.clipAction(clip);
-    action.play();
+    action.setLoop(LoopOnce);
     return action;
 }
 
@@ -79,6 +81,19 @@ function animateRenderer(renderer, scene, camera) {
         animationMixer.update(delta);
     }
     renderer.render(scene, camera);
+}
+function playCardAnimationButton() {
+    const button = document.getElementById('animButton');
+    const clip = THREE.AnimationClip.findByName(clips, 'CardBounce');
+    const action = animationMixer.clipAction(clip);
+    if (!action.isRunning()) {
+        action.reset();
+        action.play();
+        button.classList.add('button-pressed');
+        setTimeout(() => {
+            button.classList.remove('button-pressed');
+        }, 4500);
+    }
 }
 
 function setupWindowResize(renderer, camera) {
